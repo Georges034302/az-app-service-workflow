@@ -28,8 +28,7 @@ AZURE_CREDENTIALS=$(az ad sp create-for-rbac \
   --name "$SP_NAME" \
   --role contributor \
   --scopes "/subscriptions/$SUBSCRIPTION_ID" \
-  --query "{clientId: appId, clientSecret: password, tenantId: tenant, subscriptionId: '$SUBSCRIPTION_ID'}" \
-  --output json)
+  --sdk-auth)
 
 # === Save to temp file for later use if needed ===
 echo "$AZURE_CREDENTIALS" > creds.json
