@@ -1,36 +1,44 @@
 #!/bin/bash
 set -e
 
+echo ""
 echo "🚀 Starting full environment setup..."
+echo "====================================="
 
-# === Step 1: Install Environment Tools ===
-echo "🔧 [1/5] GitHub CLI authentication..."
+# === Step 1: Install Tools ===
+echo "🔧 [1/5] Installing and verifying CLI tools..."
 chmod +x .github/scripts/tools_config.sh
 source .github/scripts/tools_config.sh
-echo "✅ Environment tools installed successfully."
+echo "✅ Environment tools verified."
+echo ""
 
 # === Step 2: GitHub CLI Login & GH_TOKEN setup ===
-echo "🔐 [2/5] GitHub CLI authentication..."
+echo "🔐 [2/5] Authenticating GitHub CLI and saving GH_TOKEN..."
 chmod +x .github/scripts/gh_setup.sh
 source .github/scripts/gh_setup.sh
-echo "✅ GitHub CLI already authenticated."
+echo "✅ GitHub CLI authentication complete."
+echo ""
 
-# === Step 3: Azure CLI Login & Resource Group/SP setup ===
-echo "🌐 [3/5] Azure CLI login and resource group setup..."
+# === Step 3: Azure CLI Login ===
+echo "🌐 [3/5] Authenticating with Azure CLI..."
 chmod +x .github/scripts/az_login.sh
 source .github/scripts/az_login.sh
-echo "✅ Authenticated with Azure CLI."
+echo "✅ Azure CLI login complete."
+echo ""
 
-# === Step 4: Azure Resource Group and Service Principal Setup ===
-echo "🏗️ [4/5] Setting up Azure resource group and service principal..."
+# === Step 4: Resource Group and Service Principal Setup ===
+echo "🏗️  [4/5] Creating resource group and service principal..."
 chmod +x .github/scripts/az_setup.sh
 source .github/scripts/az_setup.sh
-echo "✅ Azure resource group and service principal setup complete."
+echo "✅ Resource group and SP setup complete."
+echo ""
 
 # === Step 5: ACR Setup ===
-echo "📦 [5/5] ACR configuration..."
+echo "📦 [5/5] Creating ACR and assigning SP role..."
 chmod +x .github/scripts/acr_setup.sh
-source .github/scripts/acr_setup.sh 
-echo "✅ Azure Container Registry setup complete."
+source .github/scripts/acr_setup.sh
+echo "✅ ACR setup complete."
+echo ""
 
-
+echo "🎉 Environment setup completed successfully!"
+echo "============================================"
