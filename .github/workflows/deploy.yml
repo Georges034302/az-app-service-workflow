@@ -28,6 +28,9 @@ jobs:
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
+        
+    - name: 🧪 Dump AZURE_CREDENTIALS format (debug only!)
+      run: echo "${{ secrets.AZURE_CREDENTIALS }}"
 
     - name: 🏗️ Create App Service + Push Image
       run: bash .github/scripts/create_app_service.sh
