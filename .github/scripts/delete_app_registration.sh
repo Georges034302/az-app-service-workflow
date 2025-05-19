@@ -13,3 +13,6 @@ if [[ -n "$APP_ID" ]]; then
 else
   echo "ℹ️  No Azure AD app registration found for: $APP_NAME"
 fi
+
+az ad app list --display-name azappsvc-sp --query "[0].appId" -o tsv | xargs az ad app delete --id
+az login
