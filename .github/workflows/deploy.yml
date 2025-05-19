@@ -12,15 +12,15 @@ jobs:
     - name: 📥 Checkout repository
       uses: actions/checkout@v3
 
-    - name: 💠 Azure CLI login
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-
     - name: 🧪 Run environment setup (GitHub + Azure + ACR)
       run: bash .github/scripts/setup.sh
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+    - name: 💠 Azure CLI login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: 🚀 Final deployment step
       run: bash .github/scripts/deploy.sh
