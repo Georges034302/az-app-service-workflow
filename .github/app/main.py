@@ -1,9 +1,12 @@
 from fastapi import FastAPI, HTTPException
 import json
+import os
 
 app = FastAPI()
 
-with open("app/data.json") as f:
+# Ensure the correct path to data.json regardless of working directory
+data_path = os.path.join(os.path.dirname(__file__), "data.json")
+with open(data_path) as f:
     users = json.load(f)
 
 @app.get("/users")

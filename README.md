@@ -1,10 +1,10 @@
-# 🐍 Employee API (Containerized Python App on Azure App Service)
+## 🐍 Employee API (Containerized Python App on Azure App Service)
 
 This project provides a minimal FastAPI-based backend API to simulate an employee directory. The API is packaged into a Docker container, pushed to Azure Container Registry (ACR), and deployed to Azure App Service for Linux using **GitHub Actions**.
 
 ---
 
-## 📌 Features
+### 📌 Features
 
 - ✅ Python + FastAPI-based backend API
 - 📦 Dockerized and deployed to **Azure App Service**
@@ -14,7 +14,7 @@ This project provides a minimal FastAPI-based backend API to simulate an employe
 
 ---
 
-## 🧪 API Endpoints
+### 🧪 API Endpoints
 
 | Method | Endpoint         | Description                 |
 |--------|------------------|-----------------------------|
@@ -32,9 +32,9 @@ Sample response from `/users`:
 
 ---
 
-## ⚙️ Setup Instructions
+### ⚙️ Setup Instructions
 
-### 1. 🔐 GitHub Secrets Required
+#### 1. 🔐 GitHub Secrets Required
 
 | Secret Name             | Description                                      |
 |-------------------------|--------------------------------------------------|
@@ -46,19 +46,25 @@ Sample response from `/users`:
 
 ---
 
-### 2. 📁 Project Structure
+#### 2. 📁 Project Structure
 
 ```
-employee-api/
-├── app/
-│   ├── __init__.py
-│   ├── main.py
-│   └── data.json
-├── azure/
-│   ├── deploy.sh
-│   ├── login.sh
-│   └── configure-container.sh
+az-app-service-workflow/
 ├── .github/
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── main.py
+│   │   └── data.json
+│   ├── azure/
+│   │   ├── acr_setup.sh
+│   │   ├── az_login.sh
+│   │   ├── az_setup.sh
+│   │   ├── configure-container.sh
+│   │   ├── container_config.sh
+│   │   ├── deploy.sh
+│   │   ├── gh_setup.sh
+│   │   ├── setup.sh
+│   │   └── tools_config.sh
 │   └── workflows/
 │       └── deploy.yml
 ├── Dockerfile
@@ -68,28 +74,39 @@ employee-api/
 
 ---
 
-### 3. ☁️ Azure CLI Deployment
+#### 3. ⚙️ Local Setup & Deployment
 
-```bash
-cd azure
-bash deploy.sh
-```
+1. **Install prerequisites:**  
+   Make sure you have [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli), [GitHub CLI](https://cli.github.com/), and `jq` installed.  
+   You can run:
+   ```bash
+   bash .github/azure/tools_config.sh
+   ```
 
-This script provisions the Azure infrastructure stack and prepares the app for deployment.
+2. **Authenticate and configure environment:**  
+   ```bash
+   cd .github/azure
+   bash setup.sh
+   ```
+
+3. **Deploy to Azure (manual run):**  
+   ```bash
+   bash deploy.sh
+   ```
 
 ---
 
-### 4. 🚀 CI/CD with GitHub Actions
+#### 4. 🚀 CI/CD with GitHub Actions
 
-Triggered on push to `main` branch. Uses GitHub secrets and scripts to:
-
-- Log in to Azure
-- Build and push Docker image to ACR
-- Configure App Service to use image
+- Triggered on push to `main` branch.
+- Uses GitHub secrets and scripts to:
+  - Log in to Azure
+  - Build and push Docker image to ACR
+  - Configure App Service to use image
 
 ---
 
-### 5. 🐳 Local Docker Run (for testing)
+#### 5. 🐳 Local Docker Run (for testing)
 
 ```bash
 docker build -t employee-api .
@@ -100,6 +117,5 @@ Access API at: [http://localhost](http://localhost)
 
 ---
 
-## 🛡️ License
-
-MIT License
+#### 👨‍💻 Author: Georges Bou Ghantous
+*This repository demonstrates automated deployment of a Python FastAPI app to Azure App Service and Azure Container Registry (ACR) using GitHub Actions. 💙*
