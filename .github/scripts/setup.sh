@@ -6,6 +6,13 @@ echo "🚀 Starting full environment setup..."
 # === Shared context ===
 RESOURCE_GROUP=$(gh secret get RESOURCE_GROUP --repo "$REPO_FULL" --jq .value 2>/dev/null || echo "")
 ACR_NAME=$(gh secret get ACR_NAME --repo "$REPO_FULL" --jq .value 2>/dev/null || echo "")
+SP_APP_ID=$(gh secret list --repo "$REPO_FULL" | grep SP_APP_ID &>/dev/null && gh secret set SP_APP_ID --repo "$REPO_FULL" --output json | jq -r .value 2>/dev/null || echo "")
+
+# === Step 0: Install Environment Tools ===
+echo "🔧 [0/5] GitHub CLI authentication..."
+chmod +x .github/scripts/tools_config.sh
+source .github/scripts/tools_config.sh
+echo "✅ Environment tools installed successfully."
 
 # === Step 1: GitHub CLI Login & GH_TOKEN setup ===
 echo "🔐 [1/5] GitHub CLI authentication..."

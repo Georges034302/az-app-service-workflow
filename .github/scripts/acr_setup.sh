@@ -43,8 +43,11 @@ ACR_PASSWORD=$(az acr credential show --name "$ACR_NAME" --query "passwords[0].v
 echo "🔎 Fetching ACR resource ID..."
 ACR_ID=$(az acr show --name "$ACR_NAME" --query id -o tsv)
 
-echo "🔎 Fetching Service Principal App ID from GitHub secrets..."
-SP_APP_ID=$(gh secret get SP_APP_ID --repo "$REPO_FULL" | tail -n 1)
+# Instead, check if SP_APP_ID is set (from argument or env)
+if [[ -z "$SP_APP_ID" ]]; then
+  echo "❌ SP_APP_ID is not set. Please provide it as an argument or environment variable."
+  exit 1
+fi
 
 echo "🔗 Assigning 'AcrPush' role to Service Principal for ACR..."
 az role assignment create \
