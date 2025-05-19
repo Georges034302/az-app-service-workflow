@@ -15,7 +15,7 @@ fi
 # === Step: Set ACR_NAME ===
 if ! gh secret list --repo "$REPO_FULL" | grep -q "ACR_NAME"; then
   CLEAN_OWNER="${OWNER//[^a-zA-Z0-9]/}"           # Remove special characters
-  ACR_NAME="az-${CLEAN_OWNER,,}-acr"              # Lowercase ACR name
+  ACR_NAME="az${CLEAN_OWNER,,}acr"                # Lowercase, no dashes
   ACR_NAME="${ACR_NAME:0:50}"                     # Enforce Azure ACR name limit
   echo "🔧 Saving fixed ACR_NAME: $ACR_NAME"
   gh secret set ACR_NAME --body "$ACR_NAME" --repo "$REPO_FULL"
