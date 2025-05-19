@@ -48,12 +48,16 @@ ACR_USERNAME=$(az acr credential show --name "$ACR_NAME" --query username -o tsv
 ACR_PASSWORD=$(az acr credential show --name "$ACR_NAME" --query "passwords[0].value" -o tsv)
 ACR_ID=$(az acr show --name "$ACR_NAME" --query id -o tsv)
 
-# --- Assign AcrPush role to SP ---
-echo "🔗 Assigning 'AcrPush' role to SP '$SP_APP_ID' on ACR '$ACR_NAME'..."
-az role assignment create \
-  --assignee "$SP_APP_ID" \
-  --role "AcrPush" \
-  --scope "$ACR_ID"
+if az role assignment list --assignee "$SP_APP_ID" --scope "$ACR_ID" --query "[?roleDefinitionName=='AcrPush']" -o tsv | grep -q "AcrPush"; then
+  echo "✅ 'AcrPush' role already assigned to SP."
+else
+  echo "🔗 Assigning 'AcrPush' role to SP..."
+  az role assignment create \
+    --assignee "$SP_APP_ID" \
+    --role "AcrPush" \
+    --scope "$ACR_ID"
+fi
+
 
 # --- Save secrets ---
 echo "💾 Saving ACR credentials to GitHub secrets..."
