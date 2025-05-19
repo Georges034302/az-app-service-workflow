@@ -16,6 +16,7 @@ else
   echo "❌ Could not parse OWNER and REPO from remote URL: $REMOTE_URL"
   exit 1
 fi
+export REPO_FULL
 
 echo "🚫 Unsetting GITHUB_TOKEN environment variable..."
 unset GITHUB_TOKEN

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-ACR_NAME="azacr-repo"
+ACR_NAME="az_acr_$(date +%s)"
 RESOURCE_GROUP="$1"
 
 echo "🔍 Checking if Azure Container Registry '$ACR_NAME' exists in resource group '$RESOURCE_GROUP'..."
