@@ -3,14 +3,19 @@ set -e
 
 HOSTNAME="github.com"
 
-echo "👤 Getting GitHub username..."
-export OWNER=$(gh api user --jq .login)
-
-echo "📦 Getting repository name..."
-export REPO=$(basename -s .git "$(git config --get remote.origin.url)")
-
-echo "🔗 Setting full repository name..."
-export REPO_FULL="$OWNER/$REPO"
+echo "🔗 Extracting OWNER and REPO from git remote URL..."
+REMOTE_URL=$(git config --get remote.origin.url)
+if [[ "$REMOTE_URL" =~ github.com[:/]+([^/]+)/([^.]+)(\.git)?$ ]]; then
+  OWNER="${BASH_REMATCH[1]}"
+  REPO="${BASH_REMATCH[2]}"
+  REPO_FULL="$OWNER/$REPO"
+  echo "   OWNER: $OWNER"
+  echo "   REPO: $REPO"
+  echo "   REPO_FULL: $REPO_FULL"
+else
+  echo "❌ Could not parse OWNER and REPO from remote URL: $REMOTE_URL"
+  exit 1
+fi
 
 echo "🚫 Unsetting GITHUB_TOKEN environment variable..."
 unset GITHUB_TOKEN
