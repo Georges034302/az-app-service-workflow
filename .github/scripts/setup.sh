@@ -30,7 +30,7 @@ echo "✅ Azure resource group and service principal setup complete."
 # === Step 5: ACR Setup ===
 echo "📦 [5/5] ACR configuration..."
 chmod +x .github/scripts/acr_setup.sh
-source .github/scripts/acr_setup.sh "$RESOURCE_GROUP" "$SP_APP_ID"
+source .github/scripts/acr_setup.sh 
 echo "✅ Azure Container Registry setup complete."
 
 

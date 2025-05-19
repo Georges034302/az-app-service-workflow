@@ -16,10 +16,24 @@ This project provides a minimal FastAPI-based backend API to simulate an employe
 
 ### 🧪 API Endpoints
 
-| Method | Endpoint         | Description                 |
-|--------|------------------|-----------------------------|
-| GET    | `/users`         | List all employees          |
-| GET    | `/users/{id}`    | Get a single employee by ID |
+| Method | Endpoint                   | Description                        |
+|--------|----------------------------|------------------------------------|
+| GET    | `/users`                   | List all employees                 |
+| GET    | `/users/{id}`              | Get a single employee by ID        |
+
+**Full API URLs after deployment:**
+
+- **Get all users:**  
+  ```
+  https://<APP_NAME>.azurewebsites.net/users
+  ```
+
+- **Get user by ID (example for user 2):**  
+  ```
+  https://<APP_NAME>.azurewebsites.net/users/2
+  ```
+
+Replace `<APP_NAME>` with your actual Azure App Service name.
 
 Sample response from `/users`:
 ```json
