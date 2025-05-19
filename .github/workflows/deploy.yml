@@ -1,0 +1,33 @@
+name: Deploy to Azure
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Azure login
+      run: bash azure/login.sh
+      env:
+        AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+        AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Build and Push Docker image
+      run: |
+        az acr login --name $ACR_NAME
+        docker build -t $ACR_NAME.azurecr.io/employee-api:latest .
+        docker push $ACR_NAME.azurecr.io/employee-api:latest
+      env:
+        ACR_NAME: ${{ secrets.ACR_NAME }}
+
+    - name: Configure Azure Web App
+      run: bash azure/configure-container.sh
+      env:
+        APP_NAME: ${{ secrets.APP_NAME }}
+        RESOURCE_GROUP: ${{ secrets.RESOURCE_GROUP }}
+        ACR_NAME: ${{ secrets.ACR_NAME }}

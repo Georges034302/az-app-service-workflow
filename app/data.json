@@ -1,0 +1,5 @@
+[
+  {"id": 1, "name": "Alice", "role": "Manager", "department": "HR", "city": "Sydney"},
+  {"id": 2, "name": "Bob", "role": "Developer", "department": "IT", "city": "Melbourne"},
+  {"id": 3, "name": "Eve", "role": "Analyst", "department": "Finance", "city": "Brisbane"}
+]
