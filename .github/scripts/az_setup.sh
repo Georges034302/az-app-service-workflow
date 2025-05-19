@@ -14,6 +14,18 @@ else
   echo "✅ Resource group '$RESOURCE_GROUP' created."
 fi
 
+# Ensure SUBSCRIPTION_ID is set
+if [[ -z "$SUBSCRIPTION_ID" ]]; then
+  echo "📘 Fetching Azure Subscription ID..."
+  SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+  if [[ -z "$SUBSCRIPTION_ID" ]]; then
+    echo "❌ Could not determine Azure Subscription ID. Please login with 'az login' first."
+    exit 1
+  fi
+  export SUBSCRIPTION_ID
+  echo "📘 Subscription ID: $SUBSCRIPTION_ID"
+fi
+
 echo "🔐 Creating Azure service principal for RBAC (future-proof, no --sdk-auth)..."
 AZURE_CREDENTIALS=$(az ad sp create-for-rbac \
   --name "$SP_NAME" \
@@ -35,20 +47,7 @@ gh secret set LOCATION --body "$LOCATION" --repo "$REPO_FULL"
 gh secret set SP_NAME --body "$SP_NAME" --repo "$REPO_FULL"
 gh secret set SP_APP_ID --body "$SP_APP_ID" --repo "$REPO_FULL"
 
-echo "⏳ Waiting for Azure AD propagation..."
+echo "✅ Secrets have been set in the GitHub repository. Waiting for Azure AD propagation..."
 sleep 20
 
-echo "🔑 Logging in to Azure CLI using service principal (non-interactive)..."
-for i in {1..5}; do
-  if az login \
-    --service-principal \
-    --username "$SP_APP_ID" \
-    --password "$(jq -r .clientSecret creds.json)" \
-    --tenant "$(jq -r .tenantId creds.json)"; then
-    echo "✅ Azure login, resource group, and service principal setup complete."
-    break
-  else
-    echo "⚠️ Azure login failed. Retrying in 10 seconds... (attempt $i/5)"
-    sleep 10
-  fi
-done
+
