@@ -18,20 +18,15 @@ else
 fi
 export REPO_FULL
 
-echo "🚫 Unsetting GITHUB_TOKEN environment variable..."
-unset GITHUB_TOKEN
-
-echo "🔒 Logging out of GitHub CLI for $HOSTNAME (if logged in)..."
-gh auth logout --hostname "$HOSTNAME" || true
-
-echo "🔑 Checking GitHub CLI authentication status..."
-if ! gh auth status --hostname "$HOSTNAME" &>/dev/null; then
-  echo "🔑 Logging in to GitHub CLI with provided GH_TOKEN..."
-  echo "$GH_TOKEN" | gh auth login --hostname "$HOSTNAME" --with-token
+echo "🔑 Authenticating GitHub CLI using GH_TOKEN from environment (non-interactive)..."
+if [[ -z "$GH_TOKEN" ]]; then
+  echo "❌ GH_TOKEN is not set in the environment. Please ensure it is available (e.g., in ~/.bashrc)."
+  exit 1
 fi
 
-echo "✅ GitHub CLI authentication status:"
-gh auth status
+export GITHUB_TOKEN="$GH_TOKEN"
+
+echo "✅ GitHub CLI will use GH_TOKEN for authentication (no web login required)."
 
 echo "🔐 Saving GH_TOKEN to repository secrets..."
 gh secret set GH_TOKEN --body "$GH_TOKEN" --repo "$REPO_FULL"

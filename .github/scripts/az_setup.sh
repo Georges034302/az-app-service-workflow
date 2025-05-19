@@ -14,12 +14,21 @@ else
   echo "✅ Resource group '$RESOURCE_GROUP' created."
 fi
 
-echo "🔐 Creating Azure service principal for RBAC..."
+echo "🔐 Creating Azure service principal for RBAC (future-proof, no --sdk-auth)..."
 AZURE_CREDENTIALS=$(az ad sp create-for-rbac \
   --name "$SP_NAME" \
   --role contributor \
-  --scopes /subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP \
-  --sdk-auth)
+  --scopes "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP" \
+  --query "{clientId: appId, clientSecret: password, tenantId: tenant, subscriptionId: '$SUBSCRIPTION_ID'}" \
+  --output json)
+
+echo "$AZURE_CREDENTIALS" > creds.json
+
+az login \
+  --service-principal \
+  --username "$(jq -r .clientId creds.json)" \
+  --password "$(jq -r .clientSecret creds.json)" \
+  --tenant "$(jq -r .tenantId creds.json)"
 
 echo "🔎 Extracting service principal appId..."
 SP_APP_ID=$(echo "$AZURE_CREDENTIALS" | jq -r '.clientId')

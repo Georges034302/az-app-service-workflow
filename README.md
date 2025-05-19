@@ -63,6 +63,7 @@ az-app-service-workflow/
 │   │   ├── container_config.sh
 │   │   ├── deploy.sh
 │   │   ├── gh_setup.sh
+│   │   ├── login.sh
 │   │   ├── setup.sh
 │   │   └── tools_config.sh
 │   └── workflows/
