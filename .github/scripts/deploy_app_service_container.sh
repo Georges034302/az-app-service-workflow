@@ -35,9 +35,5 @@ az webapp config container set \
   --docker-custom-image-name "$ACR_NAME.azurecr.io/employee-api:latest" \
   --docker-registry-server-url "https://$ACR_NAME.azurecr.io"
 
-# --- Save APP_NAME to secrets only after success ---
-echo "🔐 Saving APP_NAME to GitHub secrets..."
-gh secret set APP_NAME --body "$APP_NAME" --repo "$REPO_FULL"
-
 echo "✅ Web App container successfully configured for '$APP_NAME'"
 echo "=============================================="

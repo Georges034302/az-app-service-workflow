@@ -1,5 +1,9 @@
 #!/bin/bash
 set -e
+APP_NAME="employee-api-appsvc"
+RESOURCE_GROUP="${RESOURCE_GROUP:-}"
+ACR_NAME="${ACR_NAME:-}"
+REPO_FULL="${REPO_FULL:-}"
 
 # === Validate required inputs ===
 if [[ -z "$APP_NAME" || -z "$RESOURCE_GROUP" || -z "$ACR_NAME" ]]; then
@@ -42,6 +46,10 @@ else
     --deployment-container-image-name "$ACR_NAME.azurecr.io/employee-api:latest" \
     --output none
 fi
+
+# --- Save APP_NAME to secrets only after success ---
+echo "🔐 Saving APP_NAME to GitHub secrets..."
+gh secret set APP_NAME --body "$APP_NAME" --repo "$REPO_FULL"
 
 echo "✅ Web App '$APP_NAME' deployed successfully."
 echo "=============================================="

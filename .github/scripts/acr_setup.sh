@@ -2,16 +2,10 @@
 set -e
 
 # --- Load environment or fallback defaults ---
-ACR_NAME="${ACR_NAME:-}"
+ACR_NAME="employeeacr"
 RESOURCE_GROUP="${RESOURCE_GROUP:-}"
 SP_APP_ID="${SP_APP_ID:-}"
 REPO_FULL="${REPO_FULL:-}"
-
-# --- Generate ACR_NAME if not set ---
-if [[ -z "$ACR_NAME" ]]; then
-  ACR_NAME="azacr$(openssl rand -hex 3)"
-  echo "ℹ️  ACR_NAME was not provided. Generated: $ACR_NAME"
-fi
 
 # --- Validate remaining inputs ---
 if [[ -z "$RESOURCE_GROUP" || -z "$SP_APP_ID" || -z "$REPO_FULL" ]]; then
