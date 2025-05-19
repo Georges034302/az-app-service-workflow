@@ -8,23 +8,28 @@ jobs:
   setup-build-deploy:
     runs-on: ubuntu-latest
 
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      RESOURCE_GROUP: ${{ secrets.RESOURCE_GROUP }}
+      ACR_NAME: ${{ secrets.ACR_NAME }}
+      SP_APP_ID: ${{ secrets.SP_APP_ID }}
+      REPO_FULL: ${{ secrets.REPO_FULL }}
+      APP_NAME: ${{ secrets.APP_NAME }}
+
     steps:
     - name: 📥 Checkout repository
       uses: actions/checkout@v3
 
     - name: 🧪 Run environment setup (GitHub + Azure + ACR)
       run: bash .github/scripts/setup.sh
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
     - name: 💠 Azure CLI login
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+    - name: ⚙️ Configure Web App Container
+      run: bash .github/scripts/configure_container.sh
+
     - name: 🚀 Final deployment step
       run: bash .github/scripts/deploy.sh
-      env:
-        ACR_NAME: ${{ secrets.ACR_NAME }}
-        APP_NAME: ${{ secrets.APP_NAME }}
-        RESOURCE_GROUP: ${{ secrets.RESOURCE_GROUP }}

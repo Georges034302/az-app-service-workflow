@@ -36,3 +36,8 @@ echo "🔐 Saving GH_TOKEN to repository secrets..."
 gh secret set GH_TOKEN --body "$TEMP_TOKEN" --repo "$REPO_FULL"
 
 echo "✅ GH_TOKEN saved to repository secrets."
+
+echo "🔐 Saving REPO_FULL to repository secrets..."
+gh secret set REPO_FULL --body "$REPO_FULL" --repo "$REPO_FULL"
+
+echo "✅ REPO_FULL saved to repository secrets."

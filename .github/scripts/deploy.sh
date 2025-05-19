@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+# === Step 5: Web App Container Configuration ===
+echo "🔧 [5/5] Configuring Web App container..."
+chmod +x .github/scripts/configure_container.sh
+source .github/scripts/configure_container.sh "$RESOURCE_GROUP" "$ACR_NAME"
+echo "✅ Setup complete and Web App container configured."
+
 # Fetch APP_NAME from GitHub secrets if not already set
 if [[ -z "$APP_NAME" ]]; then
   APP_NAME=$(gh secret list --repo "$REPO_FULL" | grep APP_NAME &>/dev/null && gh secret set APP_NAME --repo "$REPO_FULL" --output json | jq -r .value 2>/dev/null || echo "")
