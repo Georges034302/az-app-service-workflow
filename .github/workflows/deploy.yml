@@ -29,8 +29,11 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: ⚙️ Configure Web App Container
-      run: bash .github/scripts/configure_container.sh
+    - name: 🏗️ Create App Service + Push Image
+      run: bash .github/scripts/create_app_service.sh
 
-    - name: 🚀 Final deployment step
-      run: bash .github/scripts/deploy.sh
+    - name: 🚀 Deploy App Service Container
+      run: bash .github/scripts/deploy_app_service_container.sh
+
+    - name: 📦 Output Deployment Summary and Test
+      run: bash .github/scripts/output.sh

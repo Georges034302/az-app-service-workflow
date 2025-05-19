@@ -73,9 +73,10 @@ az-app-service-workflow/
 │   │   ├── acr_setup.sh
 │   │   ├── az_login.sh
 │   │   ├── az_setup.sh
-│   │   ├── container_config.sh
-│   │   ├── deploy.sh
+│   │   ├── create_app_service.sh
+│   │   ├── deploy_app_service_container.sh
 │   │   ├── gh_setup.sh
+│   │   ├── output.sh
 │   │   ├── setup.sh
 │   │   └── tools_config.sh
 │   └── workflows/
