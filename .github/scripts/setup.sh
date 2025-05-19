@@ -28,7 +28,7 @@ echo "✅ Azure resource group and service principal setup complete."
 # === Step 4: ACR Setup ===
 echo "📦 [4/5] ACR configuration..."
 chmod +x .github/scripts/acr_setup.sh
-source .github/scripts/acr_setup.sh "$RESOURCE_GROUP"
+source .github/scripts/acr_setup.sh "$RESOURCE_GROUP" "$SP_APP_ID"
 echo "✅ Azure Container Registry setup complete."
 
 # === Step 5: Web App Container Configuration ===

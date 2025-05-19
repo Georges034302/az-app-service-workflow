@@ -3,6 +3,7 @@ set -e
 
 ACR_NAME="azacr$RANDOM"
 RESOURCE_GROUP="$1"
+SP_APP_ID="$2"
 
 echo "🔍 Checking if Azure Container Registry '$ACR_NAME' exists in resource group '$RESOURCE_GROUP'..."
 if az acr show --name "$ACR_NAME" --resource-group "$RESOURCE_GROUP" &>/dev/null; then
