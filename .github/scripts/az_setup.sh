@@ -35,11 +35,20 @@ gh secret set LOCATION --body "$LOCATION" --repo "$REPO_FULL"
 gh secret set SP_NAME --body "$SP_NAME" --repo "$REPO_FULL"
 gh secret set SP_APP_ID --body "$SP_APP_ID" --repo "$REPO_FULL"
 
-echo "🔑 Logging in to Azure CLI using service principal (non-interactive)..."
-az login \
-  --service-principal \
-  --username "$SP_APP_ID" \
-  --password "$(jq -r .clientSecret creds.json)" \
-  --tenant "$(jq -r .tenantId creds.json)"
+echo "⏳ Waiting for Azure AD propagation..."
+sleep 20
 
-echo "✅ Azure login, resource group, and service principal setup complete."
+echo "🔑 Logging in to Azure CLI using service principal (non-interactive)..."
+for i in {1..5}; do
+  if az login \
+    --service-principal \
+    --username "$SP_APP_ID" \
+    --password "$(jq -r .clientSecret creds.json)" \
+    --tenant "$(jq -r .tenantId creds.json)"; then
+    echo "✅ Azure login, resource group, and service principal setup complete."
+    break
+  else
+    echo "⚠️ Azure login failed. Retrying in 10 seconds... (attempt $i/5)"
+    sleep 10
+  fi
+done
