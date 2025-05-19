@@ -15,6 +15,7 @@ jobs:
       SP_APP_ID: ${{ secrets.SP_APP_ID }}
       REPO_FULL: ${{ secrets.REPO_FULL }}
       APP_NAME: ${{ secrets.APP_NAME }}
+      SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
 
     steps:
     - name: 📥 Checkout repository

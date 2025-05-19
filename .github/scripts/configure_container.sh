@@ -1,7 +1,11 @@
 #!/bin/bash
 set -e
 
-APP_NAME="app-service-$RANDOM"
+# --- Load from environment ---
+APP_NAME="${APP_NAME:-}"
+RESOURCE_GROUP="${RESOURCE_GROUP:-}"
+ACR_NAME="${ACR_NAME:-}"
+REPO_FULL="${REPO_FULL:-}"
 
 echo "⚙️ Configuring Web App '$APP_NAME' in resource group '$RESOURCE_GROUP' to use container image from ACR '$ACR_NAME'..."
 

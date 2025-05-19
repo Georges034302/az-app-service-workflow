@@ -14,18 +14,6 @@ else
   echo "✅ Resource group '$RESOURCE_GROUP' created."
 fi
 
-# Ensure SUBSCRIPTION_ID is set
-if [[ -z "$SUBSCRIPTION_ID" ]]; then
-  echo "📘 Fetching Azure Subscription ID..."
-  SUBSCRIPTION_ID=$(az account show --query id -o tsv)
-  if [[ -z "$SUBSCRIPTION_ID" ]]; then
-    echo "❌ Could not determine Azure Subscription ID. Please login with 'az login' first."
-    exit 1
-  fi
-  export SUBSCRIPTION_ID
-  echo "📘 Subscription ID: $SUBSCRIPTION_ID"
-fi
-
 echo "🔐 Creating Azure service principal for RBAC (future-proof, no --sdk-auth)..."
 AZURE_CREDENTIALS=$(az ad sp create-for-rbac \
   --name "$SP_NAME" \

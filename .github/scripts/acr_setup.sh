@@ -1,67 +1,64 @@
 #!/bin/bash
 set -e
 
-ACR_NAME="azacr$RANDOM"
-RESOURCE_GROUP="$1"
-SP_APP_ID="$2"
+# --- Required inputs from env or secrets ---
+ACR_NAME="${ACR_NAME:-}"
+RESOURCE_GROUP="${RESOURCE_GROUP:-}"
+SP_APP_ID="${SP_APP_ID:-}"
+REPO_FULL="${REPO_FULL:-}"
 
+# --- Validate inputs ---
+if [[ -z "$ACR_NAME" || -z "$RESOURCE_GROUP" || -z "$SP_APP_ID" || -z "$REPO_FULL" ]]; then
+  echo "❌ Missing required environment variables: ACR_NAME, RESOURCE_GROUP, SP_APP_ID, or REPO_FULL"
+  exit 1
+fi
+
+# --- Check if ACR already exists ---
 echo "🔍 Checking if Azure Container Registry '$ACR_NAME' exists in resource group '$RESOURCE_GROUP'..."
 if az acr show --name "$ACR_NAME" --resource-group "$RESOURCE_GROUP" &>/dev/null; then
-  echo "✅ Azure Container Registry '$ACR_NAME' already exists."
+  echo "✅ ACR '$ACR_NAME' already exists. Skipping creation."
 else
-  ACR_CREATED=0
+  echo "📦 Creating ACR '$ACR_NAME' in resource group '$RESOURCE_GROUP'..."
   for attempt in {1..5}; do
-    echo "🛠️ Attempt $attempt: Creating Azure Container Registry '$ACR_NAME' in resource group '$RESOURCE_GROUP'..."
-    az acr create \
+    if az acr create \
       --resource-group "$RESOURCE_GROUP" \
       --name "$ACR_NAME" \
       --sku Basic \
       --location australiaeast \
       --admin-enabled true \
       --only-show-errors \
-      --output none && {
-        ACR_CREATED=1
-        echo "✅ ACR '$ACR_NAME' created."
-        break
-    }
-    echo "⚠️ Attempt $attempt failed. Retrying in 10 seconds..."
-    sleep 10
-  done
+      --output none; then
+      echo "✅ ACR '$ACR_NAME' created."
+      break
+    else
+      echo "⚠️ Attempt $attempt failed. Retrying in 10 seconds..."
+      sleep 10
+    fi
 
-  if [[ $ACR_CREATED -ne 1 ]]; then
-    echo "❌ Failed to create Azure Container Registry after 5 attempts."
-    exit 1
-  fi
+    if [[ $attempt -eq 5 ]]; then
+      echo "❌ Failed to create ACR after 5 attempts."
+      exit 1
+    fi
+  done
 fi
 
-echo "🔑 Fetching ACR username..."
+# --- Fetch ACR credentials ---
+echo "🔑 Fetching ACR credentials..."
 ACR_USERNAME=$(az acr credential show --name "$ACR_NAME" --query username -o tsv)
-
-echo "🔑 Fetching ACR password..."
 ACR_PASSWORD=$(az acr credential show --name "$ACR_NAME" --query "passwords[0].value" -o tsv)
-
-echo "🔎 Fetching ACR resource ID..."
 ACR_ID=$(az acr show --name "$ACR_NAME" --query id -o tsv)
 
-# Instead, check if SP_APP_ID is set (from argument or env)
-if [[ -z "$SP_APP_ID" ]]; then
-  echo "❌ SP_APP_ID is not set. Please provide it as an argument or environment variable."
-  exit 1
-fi
-
-echo "🔗 Assigning 'AcrPush' role to Service Principal for ACR..."
+# --- Assign AcrPush role to SP ---
+echo "🔗 Assigning 'AcrPush' role to SP '$SP_APP_ID' on ACR '$ACR_NAME'..."
 az role assignment create \
   --assignee "$SP_APP_ID" \
   --role "AcrPush" \
   --scope "$ACR_ID"
 
-echo "💾 Saving ACR_NAME to GitHub secrets..."
+# --- Save secrets ---
+echo "💾 Saving ACR credentials to GitHub secrets..."
 gh secret set ACR_NAME --body "$ACR_NAME" --repo "$REPO_FULL"
-
-echo "💾 Saving ACR_USERNAME to GitHub secrets..."
 gh secret set ACR_USERNAME --body "$ACR_USERNAME" --repo "$REPO_FULL"
-
-echo "💾 Saving ACR_PASSWORD to GitHub secrets..."
 gh secret set ACR_PASSWORD --body "$ACR_PASSWORD" --repo "$REPO_FULL"
 
-echo "✅ ACR setup and all related secrets saved."
+echo "✅ ACR setup and secrets saved."
