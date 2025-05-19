@@ -4,7 +4,7 @@ set -e
 # === Load environment or use fallback defaults ===
 RESOURCE_GROUP="${RESOURCE_GROUP:-azappsvc-rg}"
 LOCATION="${LOCATION:-australiaeast}"
-SP_NAME="${SP_NAME:-azsp-$(openssl rand -hex 3)}"
+SP_NAME="${SP_NAME:-azappsvc-sp}"
 SUBSCRIPTION_ID="${SUBSCRIPTION_ID:-}"
 REPO_FULL="${REPO_FULL:-}"
 
