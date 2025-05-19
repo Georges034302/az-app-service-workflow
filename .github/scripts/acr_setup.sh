@@ -1,19 +1,25 @@
 #!/bin/bash
 set -e
 
-# --- Required inputs from env or secrets ---
+# --- Load environment or fallback defaults ---
 ACR_NAME="${ACR_NAME:-}"
 RESOURCE_GROUP="${RESOURCE_GROUP:-}"
 SP_APP_ID="${SP_APP_ID:-}"
 REPO_FULL="${REPO_FULL:-}"
 
-# --- Validate inputs ---
-if [[ -z "$ACR_NAME" || -z "$RESOURCE_GROUP" || -z "$SP_APP_ID" || -z "$REPO_FULL" ]]; then
-  echo "❌ Missing required environment variables: ACR_NAME, RESOURCE_GROUP, SP_APP_ID, or REPO_FULL"
+# --- Generate ACR_NAME if not set ---
+if [[ -z "$ACR_NAME" ]]; then
+  ACR_NAME="azacr$(openssl rand -hex 3)"
+  echo "ℹ️  ACR_NAME was not provided. Generated: $ACR_NAME"
+fi
+
+# --- Validate remaining inputs ---
+if [[ -z "$RESOURCE_GROUP" || -z "$SP_APP_ID" || -z "$REPO_FULL" ]]; then
+  echo "❌ Missing required environment variables: RESOURCE_GROUP, SP_APP_ID, or REPO_FULL."
   exit 1
 fi
 
-# --- Check if ACR already exists ---
+# --- Check if ACR exists ---
 echo "🔍 Checking if Azure Container Registry '$ACR_NAME' exists in resource group '$RESOURCE_GROUP'..."
 if az acr show --name "$ACR_NAME" --resource-group "$RESOURCE_GROUP" &>/dev/null; then
   echo "✅ ACR '$ACR_NAME' already exists. Skipping creation."
@@ -42,12 +48,13 @@ else
   done
 fi
 
-# --- Fetch ACR credentials ---
+# --- Fetch credentials ---
 echo "🔑 Fetching ACR credentials..."
 ACR_USERNAME=$(az acr credential show --name "$ACR_NAME" --query username -o tsv)
 ACR_PASSWORD=$(az acr credential show --name "$ACR_NAME" --query "passwords[0].value" -o tsv)
 ACR_ID=$(az acr show --name "$ACR_NAME" --query id -o tsv)
 
+# --- Role assignment ---
 if az role assignment list --assignee "$SP_APP_ID" --scope "$ACR_ID" --query "[?roleDefinitionName=='AcrPush']" -o tsv | grep -q "AcrPush"; then
   echo "✅ 'AcrPush' role already assigned to SP."
 else
@@ -57,7 +64,6 @@ else
     --role "AcrPush" \
     --scope "$ACR_ID"
 fi
-
 
 # --- Save secrets ---
 echo "💾 Saving ACR credentials to GitHub secrets..."

@@ -1,10 +1,12 @@
 #!/bin/bash
 set -e
 
-# === Static/expected variables ===
-RESOURCE_GROUP="azappsvc-rg"
-LOCATION="australiaeast"
-SP_NAME="azappsvc-sp"
+# === Load environment or use fallback defaults ===
+RESOURCE_GROUP="${RESOURCE_GROUP:-azappsvc-rg}"
+LOCATION="${LOCATION:-australiaeast}"
+SP_NAME="${SP_NAME:-azsp-$(openssl rand -hex 3)}"
+SUBSCRIPTION_ID="${SUBSCRIPTION_ID:-}"
+REPO_FULL="${REPO_FULL:-}"
 
 # === Validate required inputs ===
 if [[ -z "$SUBSCRIPTION_ID" || -z "$REPO_FULL" ]]; then
@@ -12,32 +14,37 @@ if [[ -z "$SUBSCRIPTION_ID" || -z "$REPO_FULL" ]]; then
   exit 1
 fi
 
-# === Resource Group ===
+echo "📘 Configuration:"
+echo "   RESOURCE_GROUP: $RESOURCE_GROUP"
+echo "   LOCATION:       $LOCATION"
+echo "   SP_NAME:        $SP_NAME"
+
+# === Resource Group Setup ===
 echo "📦 Checking if resource group '$RESOURCE_GROUP' exists in '$LOCATION'..."
 if az group show --name "$RESOURCE_GROUP" &>/dev/null; then
   echo "✅ Resource group '$RESOURCE_GROUP' already exists."
 else
-  echo "📦 Creating resource group '$RESOURCE_GROUP' in '$LOCATION'..."
+  echo "📦 Creating resource group '$RESOURCE_GROUP'..."
   az group create --name "$RESOURCE_GROUP" --location "$LOCATION" --output none
   echo "✅ Resource group created."
 fi
 
-# === Create Service Principal and extract credentials ===
-echo "🔐 Creating Azure service principal '$SP_NAME' for subscription '$SUBSCRIPTION_ID'..."
+# === Service Principal Creation ===
+echo "🔐 Creating Azure service principal '$SP_NAME' scoped to subscription '$SUBSCRIPTION_ID'..."
 AZURE_CREDENTIALS=$(az ad sp create-for-rbac \
   --name "$SP_NAME" \
   --role contributor \
   --scopes "/subscriptions/$SUBSCRIPTION_ID" \
   --sdk-auth)
 
-# === Save to temp file for later use if needed ===
+# === Persist credentials (for optional debugging) ===
 echo "$AZURE_CREDENTIALS" > creds.json
 
-# === Extract client ID for role assignments ===
+# === Extract App ID for role assignment later ===
 SP_APP_ID=$(echo "$AZURE_CREDENTIALS" | jq -r '.clientId')
 
-# === Set GitHub secrets ===
-echo "🔑 Saving secrets to GitHub repository '$REPO_FULL'..."
+# === Save GitHub Secrets ===
+echo "🔐 Saving secrets to GitHub repository '$REPO_FULL'..."
 gh secret set AZURE_CREDENTIALS --body "$AZURE_CREDENTIALS" --repo "$REPO_FULL"
 gh secret set RESOURCE_GROUP --body "$RESOURCE_GROUP" --repo "$REPO_FULL"
 gh secret set SUBSCRIPTION_ID --body "$SUBSCRIPTION_ID" --repo "$REPO_FULL"
@@ -45,8 +52,8 @@ gh secret set LOCATION --body "$LOCATION" --repo "$REPO_FULL"
 gh secret set SP_NAME --body "$SP_NAME" --repo "$REPO_FULL"
 gh secret set SP_APP_ID --body "$SP_APP_ID" --repo "$REPO_FULL"
 
-# === Azure AD propagation wait ===
-echo "⏳ Waiting for Azure AD propagation before login/role assignments..."
+# === Wait for role propagation ===
+echo "⏳ Waiting for Azure AD propagation..."
 sleep 60
 
-echo "✅ Azure service principal created and secrets saved to GitHub."
+echo "✅ Azure service principal created and secrets saved successfully."
