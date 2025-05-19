@@ -55,7 +55,7 @@ az-app-service-workflow/
 │   │   ├── __init__.py
 │   │   ├── main.py
 │   │   └── data.json
-│   ├── azure/
+│   ├── scripts/
 │   │   ├── acr_setup.sh
 │   │   ├── az_login.sh
 │   │   ├── az_setup.sh
