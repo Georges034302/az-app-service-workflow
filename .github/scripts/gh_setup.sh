@@ -20,13 +20,15 @@ export REPO_FULL
 
 echo "🔑 Authenticating GitHub CLI using GH_TOKEN from environment (non-interactive)..."
 if [[ -z "$GH_TOKEN" ]]; then
-  echo "❌ GH_TOKEN is not set in the environment. Please ensure it is available (e.g., in ~/.bashrc)."
+  echo "❌ GH_TOKEN is not set in the environment. Please ensure it is available (e.g., in ~/.bashrc or as an environment variable)."
   exit 1
 fi
 
 export GITHUB_TOKEN="$GH_TOKEN"
 
-echo "✅ GitHub CLI will use GH_TOKEN for authentication (no web login required)."
+echo "$GH_TOKEN" | gh auth login --with-token --hostname "$HOSTNAME" --git-protocol https
+
+echo "✅ GitHub CLI authenticated using GH_TOKEN (no web login required)."
 
 echo "🔐 Saving GH_TOKEN to repository secrets..."
 gh secret set GH_TOKEN --body "$GH_TOKEN" --repo "$REPO_FULL"
