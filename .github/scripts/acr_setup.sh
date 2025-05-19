@@ -14,15 +14,15 @@ fi
 
 # === Step: Set ACR_NAME ===
 if ! gh secret list --repo "$REPO_FULL" | grep -q "ACR_NAME"; then
-  CLEAN_OWNER="${OWNER//[^a-zA-Z0-9]/}"    # remove any special characters
-  ACR_NAME="az-${CLEAN_OWNER,,}-acr"       # lowercase ACR name
-  ACR_NAME="${ACR_NAME:0:50}"              # enforce max length
-  echo "🔧 Setting fixed ACR_NAME: $ACR_NAME"
+  CLEAN_OWNER="${OWNER//[^a-zA-Z0-9]/}"           # Remove special characters
+  ACR_NAME="az-${CLEAN_OWNER,,}-acr"              # Lowercase ACR name
+  ACR_NAME="${ACR_NAME:0:50}"                     # Enforce Azure ACR name limit
+  echo "🔧 Saving fixed ACR_NAME: $ACR_NAME"
   gh secret set ACR_NAME --body "$ACR_NAME" --repo "$REPO_FULL"
 else
-  ACR_NAME="$(gh secret get ACR_NAME --repo "$REPO_FULL" --jq .value)"
-  echo "✅ ACR_NAME already exists: $ACR_NAME"
+  echo "✅ ACR_NAME already exists in GitHub Secrets. Using from environment at runtime."
 fi
+
 
 
 # --- Check if ACR exists ---
