@@ -24,7 +24,8 @@ if [[ -z "$GH_TOKEN" ]]; then
   exit 1
 fi
 
-export GITHUB_TOKEN="$GH_TOKEN"
+# Unset GITHUB_TOKEN to allow gh CLI to store credentials
+unset GITHUB_TOKEN
 
 echo "$GH_TOKEN" | gh auth login --with-token --hostname "$HOSTNAME" --git-protocol https
 
