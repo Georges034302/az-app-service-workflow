@@ -41,5 +41,5 @@ echo "✅ Azure Container Registry setup complete."
 # === Step 5: Web App Container Configuration ===
 echo "🔧 [5/5] Configuring Web App container..."
 chmod +x .github/scripts/configure_container.sh
-.github/scripts/configure_container.sh "$RESOURCE_GROUP" "$ACR_NAME"
+source .github/scripts/configure_container.sh "$RESOURCE_GROUP" "$ACR_NAME"
 echo "✅ Setup complete and Web App container configured."

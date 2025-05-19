@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+# Fetch APP_NAME from GitHub secrets if not already set
+if [[ -z "$APP_NAME" ]]; then
+  APP_NAME=$(gh secret list --repo "$REPO_FULL" | grep APP_NAME &>/dev/null && gh secret set APP_NAME --repo "$REPO_FULL" --output json | jq -r .value 2>/dev/null || echo "")
+fi
+
 echo "🔑 Logging in to Azure Container Registry '$ACR_NAME'..."
 az acr login --name "$ACR_NAME"
 
@@ -24,4 +29,23 @@ az webapp create \
   --plan "${APP_NAME}-plan" \
   --deployment-container-image-name "$ACR_NAME.azurecr.io/employee-api:latest"
 
+echo "=============================================="
 echo "✅ Deployment complete."
+echo "🌐 Your API is available at:"
+echo "https://${APP_NAME}.azurewebsites.net"
+echo "=============================================="
+
+echo ""
+echo "📡 Making test API call to /users endpoint..."
+API_URL="https://${APP_NAME}.azurewebsites.net/users"
+curl -s "$API_URL" | jq
+
+echo ""
+echo "📡 Making test API call to /users/2 endpoint..."
+USER_API_URL="https://${APP_NAME}.azurewebsites.net/users/2"
+curl -s "$USER_API_URL" | jq
+
+echo ""
+echo "✅ Sample API calls complete. You can use:"
+echo "curl $API_URL"
+echo "curl $USER_API_URL"

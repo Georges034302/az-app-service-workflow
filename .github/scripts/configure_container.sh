@@ -3,7 +3,8 @@ set -e
 
 RESOURCE_GROUP="$1"
 ACR_NAME="$2"
-APP_NAME="container-app"
+APP_NAME="app-service-$RANDOM"
+echo "ℹ️ No APP_NAME provided. Generated app name: $APP_NAME"
 
 echo "⚙️ Configuring Web App '$APP_NAME' in resource group '$RESOURCE_GROUP' to use container image from ACR '$ACR_NAME'..."
 
