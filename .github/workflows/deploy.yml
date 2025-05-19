@@ -17,7 +17,7 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-    - name: 💠 Azure CLI login (non-interactive)
+    - name: 💠 Azure CLI login
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}

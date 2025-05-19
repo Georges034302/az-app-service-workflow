@@ -43,7 +43,7 @@ echo "🔎 Fetching ACR resource ID..."
 ACR_ID=$(az acr show --name "$ACR_NAME" --query id -o tsv)
 
 echo "🔎 Fetching Service Principal App ID from GitHub secrets..."
-SP_APP_ID=$(gh secret list --repo "$REPO_FULL" | grep SP_APP_ID | awk '{print $1}' | xargs -I{} gh secret get {} --repo "$REPO_FULL" --jq .value)
+SP_APP_ID=$(gh secret get SP_APP_ID --repo "$REPO_FULL" | tail -n 1)
 
 echo "🔗 Assigning 'AcrPush' role to Service Principal for ACR..."
 az role assignment create \
