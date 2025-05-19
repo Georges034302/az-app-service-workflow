@@ -59,11 +59,9 @@ az-app-service-workflow/
 │   │   ├── acr_setup.sh
 │   │   ├── az_login.sh
 │   │   ├── az_setup.sh
-│   │   ├── configure-container.sh
 │   │   ├── container_config.sh
 │   │   ├── deploy.sh
 │   │   ├── gh_setup.sh
-│   │   ├── login.sh
 │   │   ├── setup.sh
 │   │   └── tools_config.sh
 │   └── workflows/
@@ -77,21 +75,15 @@ az-app-service-workflow/
 
 #### 3. ⚙️ Local Setup & Deployment
 
-1. **Install prerequisites:**  
-   Make sure you have [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli), [GitHub CLI](https://cli.github.com/), and `jq` installed.  
-   You can run:
+1. **Authenticate and configure environment:**  
    ```bash
-   bash .github/azure/tools_config.sh
-   ```
-
-2. **Authenticate and configure environment:**  
-   ```bash
-   cd .github/azure
+   cd .github/scripts
    bash setup.sh
    ```
 
-3. **Deploy to Azure (manual run):**  
+2. **Deploy to Azure (manual run):**  
    ```bash
+   cd .github/scripts
    bash deploy.sh
    ```
 
