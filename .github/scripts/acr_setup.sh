@@ -2,7 +2,6 @@
 set -e
 
 # --- Load environment or fallback defaults ---
-ACR_NAME="employeeacr"
 RESOURCE_GROUP="${RESOURCE_GROUP:-}"
 SP_APP_ID="${SP_APP_ID:-}"
 REPO_FULL="${REPO_FULL:-}"
@@ -12,6 +11,19 @@ if [[ -z "$RESOURCE_GROUP" || -z "$SP_APP_ID" || -z "$REPO_FULL" ]]; then
   echo "❌ Missing required environment variables: RESOURCE_GROUP, SP_APP_ID, or REPO_FULL."
   exit 1
 fi
+
+# === Step: Set ACR_NAME ===
+if ! gh secret list --repo "$REPO_FULL" | grep -q "ACR_NAME"; then
+  CLEAN_OWNER="${OWNER//[^a-zA-Z0-9]/}"    # remove any special characters
+  ACR_NAME="az-${CLEAN_OWNER,,}-acr"       # lowercase ACR name
+  ACR_NAME="${ACR_NAME:0:50}"              # enforce max length
+  echo "🔧 Setting fixed ACR_NAME: $ACR_NAME"
+  gh secret set ACR_NAME --body "$ACR_NAME" --repo "$REPO_FULL"
+else
+  ACR_NAME="$(gh secret get ACR_NAME --repo "$REPO_FULL" --jq .value)"
+  echo "✅ ACR_NAME already exists: $ACR_NAME"
+fi
+
 
 # --- Check if ACR exists ---
 echo "🔍 Checking if Azure Container Registry '$ACR_NAME' exists in resource group '$RESOURCE_GROUP'..."
@@ -61,7 +73,6 @@ fi
 
 # --- Save secrets ---
 echo "💾 Saving ACR credentials to GitHub secrets..."
-gh secret set ACR_NAME --body "$ACR_NAME" --repo "$REPO_FULL"
 gh secret set ACR_USERNAME --body "$ACR_USERNAME" --repo "$REPO_FULL"
 gh secret set ACR_PASSWORD --body "$ACR_PASSWORD" --repo "$REPO_FULL"
 
