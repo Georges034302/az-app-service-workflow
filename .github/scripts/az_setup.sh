@@ -24,12 +24,6 @@ AZURE_CREDENTIALS=$(az ad sp create-for-rbac \
 
 echo "$AZURE_CREDENTIALS" > creds.json
 
-az login \
-  --service-principal \
-  --username "$(jq -r .clientId creds.json)" \
-  --password "$(jq -r .clientSecret creds.json)" \
-  --tenant "$(jq -r .tenantId creds.json)"
-
 echo "🔎 Extracting service principal appId..."
 SP_APP_ID=$(echo "$AZURE_CREDENTIALS" | jq -r '.clientId')
 
@@ -40,5 +34,12 @@ gh secret set SUBSCRIPTION_ID --body "$SUBSCRIPTION_ID" --repo "$REPO_FULL"
 gh secret set LOCATION --body "$LOCATION" --repo "$REPO_FULL"
 gh secret set SP_NAME --body "$SP_NAME" --repo "$REPO_FULL"
 gh secret set SP_APP_ID --body "$SP_APP_ID" --repo "$REPO_FULL"
+
+echo "🔑 Logging in to Azure CLI using service principal (non-interactive)..."
+az login \
+  --service-principal \
+  --username "$SP_APP_ID" \
+  --password "$(jq -r .clientSecret creds.json)" \
+  --tenant "$(jq -r .tenantId creds.json)"
 
 echo "✅ Azure login, resource group, and service principal setup complete."
