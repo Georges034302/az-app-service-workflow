@@ -111,6 +111,7 @@ az-app-service-workflow/
   - Log in to Azure
   - Build and push Docker image to ACR
   - Configure App Service to use image
+  - Deploy container-app to App Service
 
 ---
 
