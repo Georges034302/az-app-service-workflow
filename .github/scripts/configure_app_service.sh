@@ -1,15 +1,11 @@
 #!/bin/bash
 set -e
 
-APP_NAME="${APP_NAME:-employee-api-appsvc}"
+APP_NAME="${APP_NAME:-}"
 RESOURCE_GROUP="${RESOURCE_GROUP:-}"
 ACR_NAME="${ACR_NAME:-}"
 REPO_FULL="${REPO_FULL:-}"
 
-# === Save APP_NAME to GitHub Secrets if it doesn't exist or is empty ===
-echo "🔐 Saving APP_NAME='$APP_NAME' to GitHub secrets..."
-gh secret set APP_NAME --body "$APP_NAME" --repo "$REPO_FULL"
-echo "✅ APP_NAME secret saved."
 
 # === Validate required inputs ===
 if [[ -z "$APP_NAME" || -z "$RESOURCE_GROUP" || -z "$ACR_NAME" || -z "$REPO_FULL" ]]; then
@@ -77,8 +73,6 @@ else
     --deployment-container-image-name "$ACR_NAME.azurecr.io/employee-api:latest" \
     --output none
 fi
-
-
 
 echo "✅ Web App '$APP_NAME' configured successfully."
 echo "=============================================="

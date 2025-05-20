@@ -85,3 +85,17 @@ gh secret set ACR_USERNAME --body "$ACR_USERNAME" --repo "$REPO_FULL"
 gh secret set ACR_PASSWORD --body "$ACR_PASSWORD" --repo "$REPO_FULL"
 
 echo "✅ ACR setup complete and secrets saved."
+
+echo "============================================================"
+echo "🔧 Configuring APP_NAME..."
+APP_NAME="${APP_NAME:-employee-api-appsvc}"
+
+echo "🔐 Saving APP_NAME='$APP_NAME' to GitHub secrets..."
+if gh secret set APP_NAME --body "$APP_NAME" --repo "$REPO_FULL"; then
+  echo "✅ APP_NAME secret saved."
+else
+  echo "❌ Failed to save APP_NAME. Are you running inside GitHub Actions?"
+fi
+echo "============================================================"
+
+
