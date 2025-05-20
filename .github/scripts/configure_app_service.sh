@@ -6,6 +6,19 @@ RESOURCE_GROUP="${RESOURCE_GROUP:-}"
 ACR_NAME="${ACR_NAME:-}"
 REPO_FULL="${REPO_FULL:-}"
 
+# === Save APP_NAME to GitHub Secrets only if not in GitHub Actions and not already set ===
+if [[ "$CI" != "true" ]]; then
+  if ! gh secret list --repo "$REPO_FULL" | grep -q "^APP_NAME"; then
+    echo "🔐 Saving APP_NAME to GitHub secrets..."
+    gh secret set APP_NAME --body "$APP_NAME" --repo "$REPO_FULL"
+    echo "✅ APP_NAME secret saved."
+  else
+    echo "ℹ️ APP_NAME secret already exists in GitHub. Skipping save."
+  fi
+else
+  echo "⚠️ Skipping gh secret set — not allowed in GitHub Actions context."
+fi
+
 # === Validate required inputs ===
 if [[ -z "$APP_NAME" || -z "$RESOURCE_GROUP" || -z "$ACR_NAME" || -z "$REPO_FULL" ]]; then
   echo "❌ Missing APP_NAME, RESOURCE_GROUP, ACR_NAME, or REPO_FULL."
@@ -73,14 +86,7 @@ else
     --output none
 fi
 
-# === Save APP_NAME to GitHub Secrets only if not in GitHub Actions ===
-if [[ "$CI" != "true" ]]; then
-  echo "🔐 Saving APP_NAME to GitHub secrets..."
-  gh secret set APP_NAME --body "$APP_NAME" --repo "$REPO_FULL"
-  echo "✅ APP_NAME secret saved."
-else
-  echo "⚠️ Skipping gh secret set — not allowed in GitHub Actions context."
-fi
+
 
 echo "✅ Web App '$APP_NAME' configured successfully."
 echo "=============================================="

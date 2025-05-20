@@ -27,13 +27,6 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
     
-      - name: 🐛 Debug Environment Variables
-        run: |
-          echo "APP_NAME=$APP_NAME"
-          echo "RESOURCE_GROUP=$RESOURCE_GROUP"
-          echo "ACR_NAME=$ACR_NAME"
-          echo "REPO_FULL=$REPO_FULL"
-
       - name: 🏗️ Create App Service + Push Image
         run: bash .github/scripts/configure_app_service.sh
 
