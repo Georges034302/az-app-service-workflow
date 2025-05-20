@@ -48,15 +48,15 @@ Sample response from `/users`:
 
 ### ⚙️ Setup Instructions
 
-#### 1. 🔐 GitHub Secrets Required
+#### 1. 🔁 GitHub Actions Workflows
 
-| Secret Name             | Description                                      |
-|-------------------------|--------------------------------------------------|
-| `AZURE_CREDENTIALS`     | Output of `az ad sp create-for-rbac` (JSON)     |
-| `AZURE_SUBSCRIPTION_ID` | Azure subscription ID                           |
-| `RESOURCE_GROUP`        | Azure resource group name                       |
-| `ACR_NAME`              | Azure Container Registry name (e.g., myregistry)|
-| `APP_NAME`              | Azure App Service name                          |
+**How these are used in the workflow:**
+
+- **setup-iac.yml**:  
+  *Run once to provision Azure resources and set up infrastructure-as-code (IAC) using the above secrets.*
+
+- **deploy.yml**:  
+  *Used for configuring and deploying the App Service container. This workflow expects all secrets to be present and resources to already exist (created by `setup-iac.yml`).*
 
 ---
 
@@ -91,13 +91,13 @@ az-app-service-workflow/
 
 #### 3. ⚙️ Local Setup & Deployment
 
-1. **Authenticate and configure environment: (Run-Once)**  
+I. **Authenticate and configure environment: (Run-Once)**  
    ```bash
    cd .github/scripts
    bash setup.sh
    ```
 
-2. **Deploy to Azure (manual run):**  
+II. **Deploy to Azure (manual run):**  
    ```bash
    cd .github/scripts
    bash deploy.sh

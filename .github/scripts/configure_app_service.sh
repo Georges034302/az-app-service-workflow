@@ -12,6 +12,7 @@ if [[ -z "$APP_NAME" || -z "$RESOURCE_GROUP" || -z "$ACR_NAME" || -z "$REPO_FULL
   exit 1
 fi
 
+# === Login to ACR and build image ===
 echo "🔑 Logging in to ACR '$ACR_NAME'..."
 az acr login --name "$ACR_NAME"
 
@@ -21,13 +22,36 @@ docker build -t "$ACR_NAME.azurecr.io/employee-api:latest" .
 echo "📤 Pushing Docker image to ACR..."
 docker push "$ACR_NAME.azurecr.io/employee-api:latest"
 
+# === Ensure Microsoft.Web is registered ===
+echo "🔍 Checking Microsoft.Web provider registration..."
+REGISTERED=$(az provider show --namespace Microsoft.Web --query "registrationState" -o tsv)
+if [[ "$REGISTERED" != "Registered" ]]; then
+  echo "📝 Registering Microsoft.Web..."
+  az provider register --namespace Microsoft.Web
+  echo "⏳ Waiting for Microsoft.Web to register..."
+  for i in {1..10}; do
+    sleep 10
+    REGISTERED=$(az provider show --namespace Microsoft.Web --query "registrationState" -o tsv)
+    if [[ "$REGISTERED" == "Registered" ]]; then
+      echo "✅ Microsoft.Web is now registered."
+      break
+    fi
+    echo "⌛ Still waiting... ($i/10)"
+  done
+  if [[ "$REGISTERED" != "Registered" ]]; then
+    echo "❌ Microsoft.Web failed to register after waiting."
+    exit 1
+  fi
+else
+  echo "✅ Microsoft.Web already registered."
+fi
+
 # === Ensure App Service Plan exists ===
 PLAN_NAME="${APP_NAME}-plan"
 if az appservice plan show --name "$PLAN_NAME" --resource-group "$RESOURCE_GROUP" &>/dev/null; then
   echo "✅ App Service plan '$PLAN_NAME' exists."
 else
   echo "🖥️ Creating App Service plan..."
-  az provider register --namespace Microsoft.Web
   az appservice plan create \
     --name "$PLAN_NAME" \
     --resource-group "$RESOURCE_GROUP" \
@@ -49,9 +73,14 @@ else
     --output none
 fi
 
-# --- Save APP_NAME to secrets only after success ---
-echo "🔐 Saving APP_NAME to GitHub secrets..."
-gh secret set APP_NAME --body "$APP_NAME" --repo "$REPO_FULL"
+# === Save APP_NAME to GitHub Secrets only if not in GitHub Actions ===
+if [[ "$CI" != "true" ]]; then
+  echo "🔐 Saving APP_NAME to GitHub secrets..."
+  gh secret set APP_NAME --body "$APP_NAME" --repo "$REPO_FULL"
+  echo "✅ APP_NAME secret saved."
+else
+  echo "⚠️ Skipping gh secret set — not allowed in GitHub Actions context."
+fi
 
-echo "✅ Web App '$APP_NAME' deployed successfully."
+echo "✅ Web App '$APP_NAME' configured successfully."
 echo "=============================================="
