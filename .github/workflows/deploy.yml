@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 jobs:
-  configure-deploy-app-service:
+  configure-deploy:
     name: Configure and Deploy App Service Container
     runs-on: ubuntu-latest
 
@@ -16,7 +16,7 @@ jobs:
       APP_NAME: ${{ secrets.APP_NAME }}
       SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
       REPO_FULL: ${{ secrets.REPO_FULL }}
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # ✅ Add this line
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - name: 📥 Checkout

@@ -13,7 +13,7 @@ if [[ -z "$APP_NAME" || -z "$RESOURCE_GROUP" || -z "$ACR_NAME" || -z "$REPO_FULL
 fi
 
 # --- Check if Web App exists ---
-echo "🔍 Checking if Web App '$APP_NAME' exists..."
+echo "🔍 Checking if Web App '$APP_NAME' exists in resource group '$RESOURCE_GROUP'..."
 if ! az webapp show --name "$APP_NAME" --resource-group "$RESOURCE_GROUP" &>/dev/null; then
   echo "❌ Web App '$APP_NAME' not found in resource group '$RESOURCE_GROUP'."
   echo "➡️  You must create it before running this script."
@@ -29,4 +29,4 @@ az webapp config container set \
   --docker-registry-server-url "https://$ACR_NAME.azurecr.io"
 
 echo "✅ Web App container successfully configured for '$APP_NAME'"
-echo "=============================================="
+echo "============================================================"
