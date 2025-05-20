@@ -6,17 +6,18 @@ RESOURCE_GROUP="${RESOURCE_GROUP:-}"
 ACR_NAME="${ACR_NAME:-}"
 REPO_FULL="${REPO_FULL:-}"
 
-# === Save APP_NAME to GitHub Secrets only if not in GitHub Actions and not already set ===
-if [[ "$CI" != "true" ]]; then
-  if ! gh secret list --repo "$REPO_FULL" | grep -q "^APP_NAME"; then
-    echo "🔐 Saving APP_NAME to GitHub secrets..."
-    gh secret set APP_NAME --body "$APP_NAME" --repo "$REPO_FULL"
-    echo "✅ APP_NAME secret saved."
-  else
-    echo "ℹ️ APP_NAME secret already exists in GitHub. Skipping save."
-  fi
+# === Save APP_NAME to GitHub Secrets if it doesn't exist or is empty ===
+echo "🔍 Checking if APP_NAME secret exists and is non-empty..."
+EXISTING_SECRET_VALUE=$(gh secret list --repo "$REPO_FULL" | grep -w "APP_NAME" || true)
+
+# If secret is not listed, or APP_NAME is empty in env, save it
+if [[ -z "$EXISTING_SECRET_VALUE" || -z "$APP_NAME" ]]; then
+  APP_NAME="${APP_NAME:-employee-api-appsvc}"
+  echo "🔐 Saving APP_NAME='$APP_NAME' to GitHub secrets..."
+  gh secret set APP_NAME --body "$APP_NAME" --repo "$REPO_FULL"
+  echo "✅ APP_NAME secret saved."
 else
-  echo "⚠️ Skipping gh secret set — not allowed in GitHub Actions context."
+  echo "✅ APP_NAME already exists in GitHub secrets. Using value from environment."
 fi
 
 # === Validate required inputs ===
