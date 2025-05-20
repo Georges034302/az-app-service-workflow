@@ -73,14 +73,15 @@ az-app-service-workflow/
 │   │   ├── acr_setup.sh
 │   │   ├── az_login.sh
 │   │   ├── az_setup.sh
-│   │   ├── create_app_service.sh
+│   │   ├── configure_app_service.sh
 │   │   ├── deploy_app_service_container.sh
 │   │   ├── gh_setup.sh
 │   │   ├── output.sh
 │   │   ├── setup.sh
 │   │   └── tools_config.sh
 │   └── workflows/
-│       └── deploy.yml
+│       ├── deploy.yml
+│       └── setup-iac.yml
 ├── Dockerfile
 ├── requirements.txt
 └── README.md
@@ -90,7 +91,7 @@ az-app-service-workflow/
 
 #### 3. ⚙️ Local Setup & Deployment
 
-1. **Authenticate and configure environment:**  
+1. **Authenticate and configure environment: (Run-Once)**  
    ```bash
    cd .github/scripts
    bash setup.sh
