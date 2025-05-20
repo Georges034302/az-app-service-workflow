@@ -37,9 +37,6 @@ AZURE_CREDENTIALS=$(az ad sp create-for-rbac \
   --scopes "/subscriptions/$SUBSCRIPTION_ID" \
   --sdk-auth)
 
-# === Persist credentials (for optional debugging) ===
-echo "$AZURE_CREDENTIALS" > creds.json
-
 # === Extract App ID for role assignment later ===
 SP_APP_ID=$(echo "$AZURE_CREDENTIALS" | jq -r '.clientId')
 

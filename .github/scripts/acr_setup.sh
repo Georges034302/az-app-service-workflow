@@ -5,32 +5,39 @@ set -e
 RESOURCE_GROUP="${RESOURCE_GROUP:-}"
 SP_APP_ID="${SP_APP_ID:-}"
 REPO_FULL="${REPO_FULL:-}"
+OWNER="${OWNER:-}"
 
-# --- Validate remaining inputs ---
+# --- Validate inputs ---
 if [[ -z "$RESOURCE_GROUP" || -z "$SP_APP_ID" || -z "$REPO_FULL" ]]; then
   echo "❌ Missing required environment variables: RESOURCE_GROUP, SP_APP_ID, or REPO_FULL."
   exit 1
 fi
 
-# === Step: Set ACR_NAME ===
+# --- Set ACR_NAME if not already set ---
 if ! gh secret list --repo "$REPO_FULL" | grep -q "ACR_NAME"; then
-  CLEAN_OWNER="${OWNER//[^a-zA-Z0-9]/}"           # Remove special characters
-  ACR_NAME="az${CLEAN_OWNER,,}acr"                # Lowercase, no dashes
-  ACR_NAME="${ACR_NAME:0:50}"                     # Enforce Azure ACR name limit
-  echo "🔧 Saving fixed ACR_NAME: $ACR_NAME"
+  if [[ -z "$OWNER" ]]; then
+    echo "❌ OWNER is required to compute ACR_NAME. Please export OWNER='your-org' and rerun."
+    exit 1
+  fi
+
+  CLEAN_OWNER="${OWNER//[^a-zA-Z0-9]/}"     # Remove special chars
+  ACR_NAME="az${CLEAN_OWNER,,}acr"          # Lowercase
+  ACR_NAME="${ACR_NAME:0:50}"               # Azure limit
+  echo "🔧 Generated ACR_NAME: $ACR_NAME"
+
   gh secret set ACR_NAME --body "$ACR_NAME" --repo "$REPO_FULL"
+  echo "✅ ACR_NAME saved to GitHub Secrets."
 else
-  echo "✅ ACR_NAME already exists in GitHub Secrets. Using from environment at runtime."
+  echo "✅ ACR_NAME already exists in GitHub Secrets. Assuming it's set at runtime."
+  ACR_NAME=$(az acr list --resource-group "$RESOURCE_GROUP" --query "[0].name" -o tsv)
 fi
 
-
-
-# --- Check if ACR exists ---
-echo "🔍 Checking if Azure Container Registry '$ACR_NAME' exists in resource group '$RESOURCE_GROUP'..."
+# --- Create ACR if not exists ---
+echo "🔍 Checking if ACR '$ACR_NAME' exists in RG '$RESOURCE_GROUP'..."
 if az acr show --name "$ACR_NAME" --resource-group "$RESOURCE_GROUP" &>/dev/null; then
-  echo "✅ ACR '$ACR_NAME' already exists. Skipping creation."
+  echo "✅ ACR '$ACR_NAME' already exists."
 else
-  echo "📦 Creating ACR '$ACR_NAME' in resource group '$RESOURCE_GROUP'..."
+  echo "📦 Creating ACR '$ACR_NAME'..."
   for attempt in {1..5}; do
     if az acr create \
       --resource-group "$RESOURCE_GROUP" \
@@ -60,7 +67,7 @@ ACR_USERNAME=$(az acr credential show --name "$ACR_NAME" --query username -o tsv
 ACR_PASSWORD=$(az acr credential show --name "$ACR_NAME" --query "passwords[0].value" -o tsv)
 ACR_ID=$(az acr show --name "$ACR_NAME" --query id -o tsv)
 
-# --- Role assignment ---
+# --- Assign 'AcrPush' role to SP ---
 if az role assignment list --assignee "$SP_APP_ID" --scope "$ACR_ID" --query "[?roleDefinitionName=='AcrPush']" -o tsv | grep -q "AcrPush"; then
   echo "✅ 'AcrPush' role already assigned to SP."
 else
@@ -69,11 +76,12 @@ else
     --assignee "$SP_APP_ID" \
     --role "AcrPush" \
     --scope "$ACR_ID"
+  echo "✅ 'AcrPush' role assigned."
 fi
 
-# --- Save secrets ---
-echo "💾 Saving ACR credentials to GitHub secrets..."
+# --- Save ACR credentials to GitHub Secrets ---
+echo "💾 Saving ACR credentials to GitHub Secrets..."
 gh secret set ACR_USERNAME --body "$ACR_USERNAME" --repo "$REPO_FULL"
 gh secret set ACR_PASSWORD --body "$ACR_PASSWORD" --repo "$REPO_FULL"
 
-echo "✅ ACR setup and secrets saved."
+echo "✅ ACR setup complete and secrets saved."

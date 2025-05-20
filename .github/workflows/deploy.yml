@@ -5,38 +5,30 @@ on:
     branches: [main]
 
 jobs:
-  setup-build-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     env:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
       RESOURCE_GROUP: ${{ secrets.RESOURCE_GROUP }}
+      LOCATION: ${{ secrets.LOCATION }}
       ACR_NAME: ${{ secrets.ACR_NAME }}
-      SP_APP_ID: ${{ secrets.SP_APP_ID }}
-      REPO_FULL: ${{ secrets.REPO_FULL }}
       APP_NAME: ${{ secrets.APP_NAME }}
       SUBSCRIPTION_ID: ${{ secrets.SUBSCRIPTION_ID }}
 
     steps:
-    - name: 📥 Checkout repository
-      uses: actions/checkout@v3
+      - name: 📥 Checkout
+        uses: actions/checkout@v3
 
-    - name: 🧪 Run environment setup (GitHub + Azure + ACR)
-      run: bash .github/scripts/setup.sh
+      - name: 💠 Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: 💠 Azure CLI login
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-        
-    - name: 🧪 Dump AZURE_CREDENTIALS format (debug only!)
-      run: echo "${{ secrets.AZURE_CREDENTIALS }}"
+      - name: 🏗️ Create App Service + Push Image
+        run: bash .github/scripts/create_app_service.sh
 
-    - name: 🏗️ Create App Service + Push Image
-      run: bash .github/scripts/create_app_service.sh
+      - name: 🚀 Deploy App Service Container
+        run: bash .github/scripts/deploy_app_service_container.sh
 
-    - name: 🚀 Deploy App Service Container
-      run: bash .github/scripts/deploy_app_service_container.sh
-
-    - name: 📦 Output Deployment Summary and Test
-      run: bash .github/scripts/output.sh
+      - name: 📦 Output Deployment Summary
+        run: bash .github/scripts/output.sh

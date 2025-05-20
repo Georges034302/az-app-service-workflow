@@ -1,0 +1,25 @@
+name: Setup Azure Infrastructure (One-Time)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup-infrastructure:
+    runs-on: ubuntu-latest
+
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      OWNER: ${{ github.repository_owner }}
+      RESOURCE_GROUP: azappsvc-rg
+      LOCATION: australiaeast
+      SP_NAME: azappsvc-sp
+      REPO_FULL: ${{ github.repository }}
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v3
+
+      - name: 🚀 Run full environment setup script
+        run: |
+          chmod +x .github/scripts/setup.sh
+          .github/scripts/setup.sh
