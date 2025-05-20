@@ -7,18 +7,9 @@ ACR_NAME="${ACR_NAME:-}"
 REPO_FULL="${REPO_FULL:-}"
 
 # === Save APP_NAME to GitHub Secrets if it doesn't exist or is empty ===
-echo "🔍 Checking if APP_NAME secret exists and is non-empty..."
-EXISTING_SECRET_VALUE=$(gh secret list --repo "$REPO_FULL" | grep -w "APP_NAME" || true)
-
-# If secret is not listed, or APP_NAME is empty in env, save it
-if [[ -z "$EXISTING_SECRET_VALUE" || -z "$APP_NAME" ]]; then
-  APP_NAME="${APP_NAME:-employee-api-appsvc}"
-  echo "🔐 Saving APP_NAME='$APP_NAME' to GitHub secrets..."
-  gh secret set APP_NAME --body "$APP_NAME" --repo "$REPO_FULL"
-  echo "✅ APP_NAME secret saved."
-else
-  echo "✅ APP_NAME already exists in GitHub secrets. Using value from environment."
-fi
+echo "🔐 Saving APP_NAME='$APP_NAME' to GitHub secrets..."
+gh secret set APP_NAME --body "$APP_NAME" --repo "$REPO_FULL"
+echo "✅ APP_NAME secret saved."
 
 # === Validate required inputs ===
 if [[ -z "$APP_NAME" || -z "$RESOURCE_GROUP" || -z "$ACR_NAME" || -z "$REPO_FULL" ]]; then
