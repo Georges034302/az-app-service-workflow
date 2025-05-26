@@ -11,5 +11,5 @@ fi
 
 SUBSCRIPTION_ID=$(az account show --query id -o tsv)
 echo "📘 Subscription ID: $SUBSCRIPTION_ID"
-gh secret set SUBSCRIPTION_ID       --body "$SUBSCRIPTION_ID"       --repo "$REPO_FULL"
+gh secret set SUBSCRIPTION_ID --body "$SUBSCRIPTION_ID" --repo "$REPO_FULL"
 export SUBSCRIPTION_ID

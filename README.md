@@ -108,6 +108,7 @@ II. **Deploy to Azure (manual run):**
 #### 4. 🚀 CI/CD with GitHub Actions
 
 - Triggered on push to `main` branch.
+- deploy.yaml workflow runs on push
 - Uses GitHub secrets and scripts to:
   - Log in to Azure
   - Build and push Docker image to ACR
