@@ -22,3 +22,12 @@ fi
 
 # --- Apply container config ---
 # Step 5: Apply container configuration
+echo "⚙️ Configuring Web App '$APP_NAME' to use image from ACR '$ACR_NAME'..."
+az webapp config container set \
+  --name "$APP_NAME" \
+  --resource-group "$RESOURCE_GROUP" \
+  --docker-custom-image-name "$ACR_NAME.azurecr.io/employee-api:latest" \
+  --docker-registry-server-url "https://$ACR_NAME.azurecr.io"
+
+echo "✅ Web App container successfully configured for '$APP_NAME'"
+echo "============================================================"
