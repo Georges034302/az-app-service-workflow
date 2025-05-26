@@ -108,6 +108,7 @@ II. **Deploy to Azure (manual run):**
 #### 4. 🚀 CI/CD with GitHub Actions
 
 - Triggered on push to `main` branch.
+- setup.yaml is manual run-once configuration workflow
 - deploy.yaml workflow runs on push
 - Uses GitHub secrets and scripts to:
   - Log in to Azure
