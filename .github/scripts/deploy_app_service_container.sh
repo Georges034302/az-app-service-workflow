@@ -28,6 +28,3 @@ az webapp config container set \
   --resource-group "$RESOURCE_GROUP" \
   --docker-custom-image-name "$ACR_NAME.azurecr.io/employee-api:latest" \
   --docker-registry-server-url "https://$ACR_NAME.azurecr.io"
-
-echo "✅ Web App container successfully configured for '$APP_NAME'"
-echo "============================================================"

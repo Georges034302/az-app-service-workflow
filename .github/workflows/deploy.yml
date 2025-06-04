@@ -27,12 +27,12 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: 🏗️ Create App Service + Push Image
+      # configure app service and push image to ACR
+      - name: 🛠️ Configure App Service and Push Image to ACR
         run: bash .github/scripts/configure_app_service.sh
-
+      # deploy app service container
       - name: 🚀 Deploy App Service Container
         run: bash .github/scripts/deploy_app_service_container.sh
-
+      # output deployment summary
       - name: 📦 Output Deployment Summary
         run: bash .github/scripts/output.sh

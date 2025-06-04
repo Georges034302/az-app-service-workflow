@@ -25,6 +25,7 @@ echo "📤 Pushing Docker image to ACR..."
 docker push "$ACR_NAME.azurecr.io/employee-api:latest"
 
 
+
 # === Ensure Microsoft.Web is registered ===
 # STEP 2: Ensure Microsoft.Web resource provider is registered 
 # Microsoft.Web resource provider in Azure is responsible for managing and provisioning resources related to Azure App Services
